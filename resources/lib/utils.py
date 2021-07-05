@@ -9,6 +9,7 @@ import hashlib
 from urllib.parse import unquote
 import math
 from PIL import Image, ImageOps, ImageEnhance, ImageDraw, ImageStat, ImageFilter
+import colorsys
 from .imageoperations import MyGaussianBlur
 from decimal import *
 from threading import Thread
@@ -214,24 +215,24 @@ def Color_Modify(im_color, com_color, color_eqn):
         arg = ccarg.strip().split('*')
         if arg[0] == 'hls':
             color_mod = arg[1].strip().split(';')
-            color_mod = (float(color_mod[0]), float(color_mod[1]), float(color_mod[2]))
-            hls = rgb_to_hls(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
+            color_mod = (float(color_mod[0])/1., float(color_mod[1])/1., float(color_mod[2])/1.)
+            hls = colorsys.rgb_to_hls(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
             cc_color = hls_to_rgb(one_max_loop(hls[0]+color_mod[0]), one_max_loop(hls[1]+color_mod[1]), one_max_loop(hls[2]+color_mod[2]))
         elif arg[0] == 'fhls':
             hls = rgb_to_hls(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
             color_mod = arg[1].strip().split(';')
-            color_mod = (float(check_mod(color_mod[0], hls[0])), float(check_mod(color_mod[1], hls[1])), float(check_mod(color_mod[2], hls[2])))
-            cc_color = hls_to_rgb(one_max_loop(color_mod[0]), one_max_loop(color_mod[1]), one_max_loop(color_mod[2]))
+            color_mod = (float(check_mod(float(color_mod[0]), hls[0])), float(check_mod(float(color_mod[1]), hls[1])), float(check_mod(float(color_mod[2]), hls[2])))
+            cc_color = hls_to_rgb(color_mod[0], color_mod[1], color_mod[2])
         elif arg[0] == 'hsv':
             color_mod = arg[1].strip().split(';')
             color_mod = (float(color_mod[0]), float(color_mod[1]), float(color_mod[2]))
-            hsv = rgb_to_hsv(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
+            hsv = colorsys.rgb_to_hsv(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
             cc_color = hsv_to_rgb(one_max_loop(hsv[0]+color_mod[0]), one_max_loop(hsv[1]+color_mod[1]), one_max_loop(hsv[2]+color_mod[2]))
         elif arg[0] == 'fhsv':
-            hsv = rgb_to_hsv(int(cc_color[0])/255., int(cc_color[1])/255., int(cc_color[2])/255.)
+            hsv = colorsys.rgb_to_hsv(float(cc_color[0])/255., float(cc_color[1])/255., float(cc_color[2])/255.)
             color_mod = arg[1].strip().split(';')
-            color_mod = (float(check_mod(color_mod[0]), hsv[0]), float(check_mod(color_mod[1]), hsv[1]), float(check_mod(color_mod[2]), hsv[2]))
-            cc_color = hsv_to_rgb(one_max_loop(color_mod[0]), one_max_loop(color_mod[1]), one_max_loop(color_mod[2]))
+            color_mod = (float(check_mod(float(color_mod[0])/1., hsv[0])), float(check_mod(float(color_mod[1])/1., hsv[1])), float(check_mod(float(color_mod[2])/1., hsv[2])))
+            cc_color = hsv_to_rgb(color_mod[0], color_mod[1], color_mod[2])
         elif arg[0] == 'bump':
             color_mod = int(arg[1])
             cc_color = (clamp(int(cc_color[0]) + color_mod), clamp(int(cc_color[1]) + color_mod), clamp(int(cc_color[2]) + color_mod))
@@ -279,6 +280,7 @@ def rgb_to_hsv(r, g, b):
     minc = min(r, g, b)
     v = maxc
     if minc == maxc:
+        HOME.setProperty('maxv', 'maxv:'+str(v))
         return 0.0, 0.0, v
     s = (maxc-minc) // maxc
     rc = (maxc-r) // (maxc-minc)
@@ -351,10 +353,10 @@ def one_max_loop(oml):
         return abs(oml) - 1.0
     else:
         return abs(oml)
-def check_mod(mod, hls):
-    if mod == '-':
-        return float(hls)
-    return float(mod)
+def check_mod(mod, hslv):
+    if mod >= hslv:
+        return float(mod)
+    return float(hslv)
 def Get_Colors(img, md5):
     if not colors_dict: Load_Colors_Dict()
     if md5 not in colors_dict:

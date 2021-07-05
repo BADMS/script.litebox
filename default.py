@@ -3,6 +3,7 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
+#import random
 from functools import reduce
 from threading import Thread
 ADDON =             xbmcaddon.Addon()
@@ -34,6 +35,10 @@ class ColorBoxMain:
         if self.control == "plugin":
             xbmcplugin.endOfDirectory(self.handle)
         utils.Load_Colors_Dict()
+        #RNG_daemon_set = HOME.getProperty("RNG_daemon_set")
+        #if not RNG_daemon_set == '':
+            #RNGx = int(HOME.getProperty("RNGx_set"))
+            #RNGy = int(HOME.getProperty("RNGy_set"))
         monitor = xbmc.Monitor()
         while self.daemon and not monitor.abortRequested():
             FIVE_daemon_set = HOME.getProperty("FIVE_daemon_set")
@@ -110,6 +115,12 @@ class ColorBoxMain:
                             ColorBox_settings_map[var](set)
                 except Exception as e:
                     utils.log("9err: %s img: %s" % (e,self.prefix_prev_NINE))
+            #if not RNG_daemon_set == '':
+                #try:
+                    #HOME.setProperty("RNGx_set", str(random.randrange(-RNGx, RNGx)))
+                    #HOME.setProperty("RNGy_set", str(random.randrange(-RNGy, RNGy)))
+                #except Exception as e:
+                    #utils.log("RNGerr: %s x: %s y: %s" % (e,RNGx_set,RNGy_set))
             monitor.waitForAbort(0.2)
     def _init_vars(self):
         HOME.setProperty("OldImageColorFIVE", "FFffffff")
