@@ -121,7 +121,7 @@ class ColorBoxMain:
                     #HOME.setProperty("RNGy_set", str(random.randrange(-RNGy, RNGy)))
                 #except Exception as e:
                     #utils.log("RNGerr: %s x: %s y: %s" % (e,RNGx_set,RNGy_set))
-            monitor.waitForAbort(0.1)
+            monitor.waitForAbort(0.2)
     def _init_vars(self):
         HOME.setProperty("OldImageColorFIVE", "FFffffff")
         HOME.setProperty("ImageColorFIVE", "FFffffff")
